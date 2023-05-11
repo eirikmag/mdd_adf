@@ -1,0 +1,94 @@
+{
+	"name": "watermark_table",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "altro_orchestration",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "source_table_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "source_SQL_keyvault_connection_string",
+				"type": "varchar"
+			},
+			{
+				"name": "source_db_name",
+				"type": "varchar"
+			},
+			{
+				"name": "source_schema_name",
+				"type": "varchar"
+			},
+			{
+				"name": "source_table_name",
+				"type": "varchar"
+			},
+			{
+				"name": "source_load_type",
+				"type": "varchar"
+			},
+			{
+				"name": "source_pk_columns",
+				"type": "varchar"
+			},
+			{
+				"name": "source_select_columns",
+				"type": "varchar"
+			},
+			{
+				"name": "source_watermark_column",
+				"type": "varchar"
+			},
+			{
+				"name": "source_load_frequency",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "source_is_active",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "destination_partition_by",
+				"type": "varchar"
+			},
+			{
+				"name": "destination_zorder_by",
+				"type": "varchar"
+			},
+			{
+				"name": "destination_landing_watermark",
+				"type": "varchar"
+			},
+			{
+				"name": "destination_bronzing_watermark",
+				"type": "varchar"
+			},
+			{
+				"name": "last_etl_timestamp",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "last_pipeline_run_id",
+				"type": "varchar"
+			},
+			{
+				"name": "current_pipeline_run_id",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "watermark_table"
+		}
+	}
+}
