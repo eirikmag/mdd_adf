@@ -3,67 +3,6 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "bronze_all_tables",
-				"type": "SynapseNotebook",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 2,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"parameters": {
-						"environment": {
-							"value": {
-								"value": "@replace(replace(pipeline().DataFactory,'bn-dwh-dp-',''),'-syn','')",
-								"type": "Expression"
-							},
-							"type": "string"
-						},
-						"landed_table_list": {
-							"value": {
-								"value": "@string(pipeline().parameters.TableList)",
-								"type": "Expression"
-							},
-							"type": "string"
-						},
-						"max_sequential_tables": {
-							"value": {
-								"value": "@pipeline().parameters.MaxSequentialTablesToBronze",
-								"type": "Expression"
-							},
-							"type": "int"
-						},
-						"number_of_tables": {
-							"value": {
-								"value": "@pipeline().parameters.NumberOfTables",
-								"type": "Expression"
-							},
-							"type": "int"
-						},
-						"iteration_number": {
-							"value": {
-								"value": "@pipeline().parameters.IterationNumber",
-								"type": "Expression"
-							},
-							"type": "int"
-						}
-					},
-					"snapshot": true,
-					"executorSize": "Small",
-					"conf": {
-						"spark.dynamicAllocation.enabled": true,
-						"spark.dynamicAllocation.minExecutors": 1,
-						"spark.dynamicAllocation.maxExecutors": 2
-					},
-					"driverSize": "Small",
-					"numExecutors": 1
-				}
-			},
-			{
 				"name": "update_watermark_table",
 				"type": "Script",
 				"dependsOn": [
@@ -93,6 +32,19 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "bronze_all_tables",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
 			}
 		],
 		"parameters": {
