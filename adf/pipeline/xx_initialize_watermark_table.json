@@ -4,6 +4,7 @@
 		"activities": [
 			{
 				"name": "create_watermark_table",
+				"description": "create table for metadata driven data ingestion.",
 				"type": "Script",
 				"dependsOn": [],
 				"policy": {
