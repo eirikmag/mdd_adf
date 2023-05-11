@@ -1,6 +1,37 @@
 {
 	"name": "initialize_watermark_table",
 	"properties": {
+		"activities": [
+			{
+				"name": "create_watermark_table",
+				"type": "Script",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "altro_orchestration",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"database": "orchestration_db"
+					}
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "CREATE TABLE [dbo].[watermark_table](\n\t[source_table_id] [int] IDENTITY(1,1) NOT NULL,\n\t[source_SQL_keyvault_connection_string] [varchar](50) NULL,\n\t[source_db_name] [varchar](50) NOT NULL,\n\t[source_schema_name] [varchar](50) NOT NULL,\n\t[source_table_name] [varchar](50) NOT NULL,\n\t[source_load_type] [varchar](50) NOT NULL,\n\t[source_pk_columns] [varchar](50) NULL,\n\t[source_select_columns] [varchar](max) NULL,\n\t[source_watermark_column] [varchar](255) NULL,\n\t[source_load_frequency] [int] NULL,\n\t[source_is_active] [tinyint] NULL,\n\t[destination_partition_by] [varchar](50) NULL,\n\t[destination_zorder_by] [varchar](50) NULL,\n\t[destination_landing_watermark] [varchar](50) NULL,\n\t[destination_bronzing_watermark] [varchar](50) NULL,\n\t[last_etl_timestamp] [datetime] NULL,\n\t[last_pipeline_run_id] [varchar](50) NULL,\n\t[current_pipeline_run_id] [varchar](50) NULL\n CONSTRAINT [UniqueTables] UNIQUE NONCLUSTERED \n(\n\t[source_db_name] ASC,\n\t[source_schema_name] ASC,\n\t[source_table_name] ASC\n)WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]\n) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]\nGO"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			}
+		],
 		"annotations": []
 	}
 }
