@@ -68,6 +68,36 @@
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
 				}
+			},
+			{
+				"name": "create_person_data",
+				"description": "create dummy table for person",
+				"type": "Script",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "altro_orchestration",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"database": "orchestration_db"
+					}
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "\n\nDROP TABLE [altro_data_example].[person];\nCREATE TABLE [altro_data_example].[person](\n\t[person_id] [int] IDENTITY(1,1) NOT NULL,\n\t[person_name] [varchar](250) NULL,\n    [title] [varchar](50) NULL,\n    [description] [varchar](50) NULL,\n\t[gender_id] [int] NULL,\n    [birth_date] [datetime] NULL,\n    [is_active] [int] NULL,\n\t[start_date] [datetime] NULL,\n\t[end_date] [datetime] NULL,\n    [modified_date] DATETIME NULL DEFAULT GETDATE()\n\t\n)\n;\n\nINSERT INTO [altro_data_example].[person]\n(      [person_name]\n      ,[title]\n\t  ,[description]\n      ,[gender_id]\n      ,[birth_date]\n      ,[is_active]\n      ,[start_date]\n\n\t  )\nVALUES\n('eirik','kung','more usefull information',1,'1986-01-01',1,'2022-01-01'),\n('egil','sportsidiot','more usefull informatio',1,'1986-01-01',1,'2022-01-01')"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
 			}
 		],
 		"folder": {
