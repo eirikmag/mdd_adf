@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "BronzeAllTables",
+				"name": "bronze_all_tables",
 				"type": "SynapseNotebook",
 				"dependsOn": [],
 				"policy": {
@@ -64,11 +64,11 @@
 				}
 			},
 			{
-				"name": "UpdateWaterMarkTable",
+				"name": "update_watermark_table",
 				"type": "Script",
 				"dependsOn": [
 					{
-						"activity": "BronzeAllTables",
+						"activity": "bronze_all_tables",
 						"dependencyConditions": [
 							"Succeeded"
 						]
