@@ -1,0 +1,9 @@
+{
+	"name": "databricks-accelerator-df",
+	"location": "northeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "9b5a8d0b-3e5c-4119-be4d-b14e57e44ce0",
+		"tenantId": "7c9f9c3e-386f-45e2-acc5-3d4f1f4e519e"
+	}
+}
