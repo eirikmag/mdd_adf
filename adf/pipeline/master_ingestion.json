@@ -1,0 +1,322 @@
+{
+	"name": "master_ingestion",
+	"properties": {
+		"description": "Job that loads metadatatable on source systems and builds delta lake bronze tables.",
+		"activities": [
+			{
+				"name": "get_table_list",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT [SourceTableId] ,[SourceSQLKeyVaultConnectionString],[SourceDBName] ,[SchemaName] ,[TableName] ,[LoadType] ,[WaterMarkColumn] ,[PKColumn] ,[WaterMark_Landing] ,[WaterMark_Bronzing] ,[Is_Active] ,[Last_ETL_Timestamp] ,[SelectColumns] FROM [dbo].[WatermarkTable] \nWHERE Is_Active = 1\nAND Current_PipelineRunID is null\nAND (DATEDIFF(MINUTE, Last_ETL_Timestamp, getdate()) > ([LoadFrequency] * 0.95)\nOR Last_ETL_Timestamp IS NULL)\n\n;\nUPDATE [dbo].[WatermarkTable]\nSET Current_PipelineRunID = '@{pipeline().RunId}'\nWHERE Is_Active = 1\nAND Current_PipelineRunID is null\nAND (DATEDIFF(MINUTE, Last_ETL_Timestamp, getdate()) > ([LoadFrequency] * 0.95)\nOR Last_ETL_Timestamp IS NULL)\n",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "land_for_each_table",
+				"description": "copy activity for all tables from get_table_list -step",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "get_table_list",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('get_table_list').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 10,
+					"activities": [
+						{
+							"name": "Landing",
+							"type": "Switch",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"on": {
+									"value": "@item().LoadType",
+									"type": "Expression"
+								},
+								"cases": [
+									{
+										"value": "Full",
+										"activities": [
+											{
+												"name": "2_Land_Data_Full",
+												"type": "ExecutePipeline",
+												"dependsOn": [],
+												"userProperties": [],
+												"typeProperties": {
+													"waitOnCompletion": true,
+													"parameters": {
+														"InputSourceName": {
+															"value": "@item().SourceDBName",
+															"type": "Expression"
+														},
+														"InputSchemaName": {
+															"value": "@item().SchemaName",
+															"type": "Expression"
+														},
+														"InputTableName": {
+															"value": "@item().TableName",
+															"type": "Expression"
+														},
+														"InputSelectColumns": {
+															"value": "@item().SelectColumns",
+															"type": "Expression"
+														},
+														"PipelineRunID": {
+															"value": "@pipeline().RunId",
+															"type": "Expression"
+														},
+														"InputSourceSQLKeyVaultConnectionString": {
+															"value": "@item().SourceSQLKeyVaultConnectionString",
+															"type": "Expression"
+														}
+													}
+												}
+											}
+										]
+									},
+									{
+										"value": "Delta",
+										"activities": [
+											{
+												"name": "2_Land_Data_Delta",
+												"type": "ExecutePipeline",
+												"dependsOn": [],
+												"userProperties": [],
+												"typeProperties": {
+													"waitOnCompletion": true,
+													"parameters": {
+														"InputSourceName": {
+															"value": "@item().SourceDBName",
+															"type": "Expression"
+														},
+														"InputSchemaName": {
+															"value": "@item().SchemaName",
+															"type": "Expression"
+														},
+														"InputTableName": {
+															"value": "@item().TableName",
+															"type": "Expression"
+														},
+														"WatermarkColumn": {
+															"value": "@item().WatermarkColumn",
+															"type": "Expression"
+														},
+														"InputSelectColumns": {
+															"value": "@item().SelectColumns",
+															"type": "Expression"
+														},
+														"PipelineRunID": {
+															"value": "@pipeline().RunId",
+															"type": "Expression"
+														},
+														"InputSourceSQLKeyVaultConnectionString": {
+															"value": "@item().SourceSQLKeyVaultConnectionString",
+															"type": "Expression"
+														}
+													}
+												}
+											}
+										]
+									},
+									{
+										"value": "OneTime",
+										"activities": [
+											{
+												"name": "2_Land_Data_OneTime",
+												"type": "ExecutePipeline",
+												"dependsOn": [],
+												"userProperties": [],
+												"typeProperties": {
+													"waitOnCompletion": true,
+													"parameters": {
+														"InputSourceName": {
+															"value": "@item().SourceDBName",
+															"type": "Expression"
+														},
+														"InputSchemaName": {
+															"value": "@item().SchemaName",
+															"type": "Expression"
+														},
+														"InputTableName": {
+															"value": "@item().TableName",
+															"type": "Expression"
+														},
+														"InputSelectColumns": {
+															"value": "@item().SelectColumns",
+															"type": "Expression"
+														},
+														"PipelineRunID": {
+															"value": "@pipeline().RunId",
+															"type": "Expression"
+														},
+														"InputSourceSQLKeyVaultConnectionString": {
+															"value": "@item().SourceSQLKeyVaultConnectionString",
+															"type": "Expression"
+														}
+													}
+												}
+											}
+										]
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "get_landed_tables",
+				"description": "redo query to get list of all successfully landed tables.",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "land_for_each_table",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT [SourceTableId] ,[SourceDBName] ,[SchemaName] ,[TableName] ,[LoadType] ,[WaterMarkColumn] ,[PKColumn] ,[WaterMark_Landing] ,[WaterMark_Bronzing] ,[Is_Active] ,[Last_ETL_Timestamp] ,[SelectColumns] FROM [dbo].[WatermarkTable] \nWHERE [Last_PipelineRunID] = '@{pipeline().RunId}'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "reset_current_pipeline_id",
+				"description": "update watermark table with nulls on column \"current_pipeline_id\"",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "bronze_for_each_table",
+						"dependencyConditions": [
+							"Skipped",
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 3,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "NonQuery",
+							"text": {
+								"value": "UPDATE [dbo].[WatermarkTable]\nSET Current_PipelineRunID = NULL\nWHERE Current_PipelineRunID = '@{pipeline().RunId}'",
+								"type": "Expression"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "bronze_for_each_table",
+				"description": "For every n tables, start a spark cluster",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "get_landed_tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@range(\n    1,\n    div(\n        sub(\n            add(\n                activity('get_landed_tables').output.count\n                ,pipeline().parameters.MaxSequentialTablesToBronze\n            )\n            ,1\n        )\n        ,pipeline().parameters.MaxSequentialTablesToBronze\n    )\n)",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 6,
+					"activities": [
+						{
+							"name": "BronzeData",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitOnCompletion": true,
+								"parameters": {
+									"TableList": {
+										"value": "@activity('GetLandedTableList').output.value",
+										"type": "Expression"
+									},
+									"IterationNumber": {
+										"value": "@item()",
+										"type": "Expression"
+									},
+									"MaxSequentialTablesToBronze": {
+										"value": "@pipeline().parameters.MaxSequentialTablesToBronze",
+										"type": "Expression"
+									},
+									"NumberOfTables": {
+										"value": "@activity('GetLandedTableList').output.count",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"MaxSequentialTablesToBronze": {
+				"type": "int",
+				"defaultValue": 12
+			}
+		},
+		"folder": {
+			"name": "0_Master_Pipelines/00_General_Master"
+		},
+		"annotations": []
+	}
+}
