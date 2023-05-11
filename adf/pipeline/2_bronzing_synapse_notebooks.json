@@ -1,0 +1,437 @@
+{
+	"name": "2_bronzing_synapse_notebooks",
+	"properties": {
+		"activities": [
+			{
+				"name": "BronzeAllTables",
+				"type": "SynapseNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 2,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"parameters": {
+						"environment": {
+							"value": {
+								"value": "@replace(replace(pipeline().DataFactory,'bn-dwh-dp-',''),'-syn','')",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"landed_table_list": {
+							"value": {
+								"value": "@string(pipeline().parameters.TableList)",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"max_sequential_tables": {
+							"value": {
+								"value": "@pipeline().parameters.MaxSequentialTablesToBronze",
+								"type": "Expression"
+							},
+							"type": "int"
+						},
+						"number_of_tables": {
+							"value": {
+								"value": "@pipeline().parameters.NumberOfTables",
+								"type": "Expression"
+							},
+							"type": "int"
+						},
+						"iteration_number": {
+							"value": {
+								"value": "@pipeline().parameters.IterationNumber",
+								"type": "Expression"
+							},
+							"type": "int"
+						}
+					},
+					"snapshot": true,
+					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": true,
+						"spark.dynamicAllocation.minExecutors": 1,
+						"spark.dynamicAllocation.maxExecutors": 2
+					},
+					"driverSize": "Small",
+					"numExecutors": 1
+				}
+			},
+			{
+				"name": "UpdateWaterMarkTable",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "BronzeAllTables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "NonQuery",
+							"text": {
+								"value": "\nUPDATE [dbo].[WatermarkTable]\n\nSET [WaterMark_Bronzing] = [WaterMark_Landing]\n, [Last_ETL_Timestamp] = GETDATE()\n, [Is_Active] = CASE WHEN [LoadType] = 'OneTime' THEN 0 ELSE [Is_Active] END\nWHERE SourceTableId IN (\n@{activity('BronzeAllTables').output.status.Output.result.exitValue}\n)",
+								"type": "Expression"
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"TableList": {
+				"type": "string",
+				"defaultValue": [
+					{
+						"RowNumber": 1,
+						"SourceTableId": 108,
+						"SourceDBName": "BNDWH",
+						"SchemaName": "dbo",
+						"TableName": "CurrencyRateNorgesBank",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": null,
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 2,
+						"SourceTableId": 109,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "ApplicationStatus",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "ApplicationStatusID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 3,
+						"SourceTableId": 114,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "SalesChannel",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "SalesChannelID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 4,
+						"SourceTableId": 116,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "AccommodationType",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "AccommodationTypeID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 5,
+						"SourceTableId": 118,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "Product",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "ProductID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 6,
+						"SourceTableId": 119,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "ProductGroup",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "ProductGroupID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 7,
+						"SourceTableId": 121,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "ScoreCard",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "ScorecardID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 8,
+						"SourceTableId": 122,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "Checktype",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "CheckTypeID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 9,
+						"SourceTableId": 123,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "PolicyDefinition",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "ProductID,PolicyRuleNumber",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 10,
+						"SourceTableId": 124,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "CivilStatusType",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "CivilStatusTypeID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 11,
+						"SourceTableId": 125,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "IdentificationType",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "IdentificationTypeID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 12,
+						"SourceTableId": 126,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "Region",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "RegionID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 13,
+						"SourceTableId": 127,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "ProcessDetail",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "ProcessDetailID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 14,
+						"SourceTableId": 128,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "ProcessStatus",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "ProcessStatusID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 15,
+						"SourceTableId": 129,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "Saleslocation",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "SalesLocationID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 16,
+						"SourceTableId": 130,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "AdviceType",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "AdviceTypeID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 17,
+						"SourceTableId": 136,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "Country",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": null,
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 18,
+						"SourceTableId": 138,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "KSAUser",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": "KSAUserID",
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 19,
+						"SourceTableId": 140,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "InquiryCategory",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": null,
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 20,
+						"SourceTableId": 202,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "CurrencyRateNorgesBank",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": null,
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-01-11T18:44:14.427Z",
+						"SelectColumns": "*"
+					},
+					{
+						"RowNumber": 21,
+						"SourceTableId": 209,
+						"SourceDBName": "BNSystem",
+						"SchemaName": "dbo",
+						"TableName": "EmploymentType",
+						"LoadType": "Full",
+						"WaterMarkColumn": null,
+						"PKColumn": null,
+						"WaterMark_Landing": null,
+						"WaterMark_Bronzing": null,
+						"Is_Active": 1,
+						"Last_ETL_Timestamp": "2023-02-21T14:53:10.24Z",
+						"SelectColumns": "*"
+					}
+				]
+			},
+			"IterationNumber": {
+				"type": "int",
+				"defaultValue": 1
+			},
+			"MaxSequentialTablesToBronze": {
+				"type": "int",
+				"defaultValue": 12
+			},
+			"NumberOfTables": {
+				"type": "int",
+				"defaultValue": 21
+			}
+		},
+		"folder": {
+			"name": "2_bronzing"
+		},
+		"annotations": []
+	}
+}
