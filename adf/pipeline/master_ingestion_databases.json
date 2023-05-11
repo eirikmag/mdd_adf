@@ -209,30 +209,16 @@
 					"batchCount": 6,
 					"activities": [
 						{
-							"name": "BronzeData",
+							"name": "bronze_data",
 							"type": "ExecutePipeline",
 							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
-								"waitOnCompletion": true,
-								"parameters": {
-									"TableList": {
-										"value": "@activity('GetLandedTableList').output.value",
-										"type": "Expression"
-									},
-									"IterationNumber": {
-										"value": "@item()",
-										"type": "Expression"
-									},
-									"MaxSequentialTablesToBronze": {
-										"value": "@pipeline().parameters.MaxSequentialTablesToBronze",
-										"type": "Expression"
-									},
-									"NumberOfTables": {
-										"value": "@activity('GetLandedTableList').output.count",
-										"type": "Expression"
-									}
-								}
+								"pipeline": {
+									"referenceName": "2_bronzing_databricks_notebooks",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true
 							}
 						}
 					]
