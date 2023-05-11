@@ -1,5 +1,13 @@
 {
 	"name": "databricks-accelerator-df",
+	"properties": {
+		"globalParameters": {
+			"environment": {
+				"type": "string",
+				"value": "dev"
+			}
+		}
+	},
 	"location": "northeurope",
 	"identity": {
 		"type": "SystemAssigned",
