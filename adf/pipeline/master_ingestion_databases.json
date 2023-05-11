@@ -1,7 +1,7 @@
 {
-	"name": "master_ingestion",
+	"name": "master_ingestion_databases",
 	"properties": {
-		"description": "Job that loads metadatatable on source systems and builds delta lake bronze tables.",
+		"description": "Job that loads metadata on tables from watermark table and lands and bronzes to delta-files",
 		"activities": [
 			{
 				"name": "get_table_list",
@@ -315,7 +315,7 @@
 			}
 		},
 		"folder": {
-			"name": "0_Master_Pipelines/00_General_Master"
+			"name": "0_master_pipelines"
 		},
 		"annotations": []
 	}
