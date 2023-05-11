@@ -5,6 +5,10 @@
 			"environment": {
 				"type": "string",
 				"value": "dev"
+			},
+			"landing_storage_account": {
+				"type": "string",
+				"value": "databricksdbtdemost"
 			}
 		}
 	},
