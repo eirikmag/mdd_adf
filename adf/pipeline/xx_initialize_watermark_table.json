@@ -26,44 +26,7 @@
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "CREATE TABLE [dbo].[watermark_table](\n\t[source_table_id] [int] IDENTITY(1,1) NOT NULL,\n\t[source_SQL_keyvault_connection_string] [varchar](50) NULL,\n\t[source_db_name] [varchar](50) NOT NULL,\n\t[source_schema_name] [varchar](50) NOT NULL,\n\t[source_table_name] [varchar](50) NOT NULL,\n\t[source_load_type] [varchar](50) NOT NULL,\n\t[source_pk_columns] [varchar](50) NULL,\n\t[source_select_columns] [varchar](max) NULL,\n\t[source_watermark_column] [varchar](255) NULL,\n\t[source_load_frequency] [int] NULL,\n\t[source_is_active] [tinyint] NULL,\n\t[destination_partition_by] [varchar](50) NULL,\n\t[destination_zorder_by] [varchar](50) NULL,\n\t[destination_landing_watermark] [varchar](50) NULL,\n\t[destination_bronzing_watermark] [varchar](50) NULL,\n\t[last_etl_timestamp] [datetime] NULL,\n\t[last_pipeline_run_id] [varchar](50) NULL,\n\t[current_pipeline_run_id] [varchar](50) NULL\n CONSTRAINT [UniqueTables] UNIQUE NONCLUSTERED \n(\n\t[source_db_name] ASC,\n\t[source_schema_name] ASC,\n\t[source_table_name] ASC\n)WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]\n) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]\n"
-						}
-					],
-					"scriptBlockExecutionTimeout": "02:00:00"
-				}
-			},
-			{
-				"name": "insert_dummy_table_data",
-				"description": "insert examples of metadata into watermark_table",
-				"type": "Script",
-				"dependsOn": [
-					{
-						"activity": "create_watermark_table",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"linkedServiceName": {
-					"referenceName": "altro_orchestration",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"database": "orchestration_db"
-					}
-				},
-				"typeProperties": {
-					"scripts": [
-						{
-							"type": "Query",
-							"text": "\nINSERT INTO [dbo].[watermark_table]\n(            [source_db_name]\n      ,[source_schema_name]\n      ,[source_table_name]\n      ,[source_load_type]\n\t  ,[source_watermark_column]\n      ,[source_pk_columns]\n      ,[source_select_columns]\n      ,[source_is_active]\n      ,[source_load_frequency]\n\n\t  )\nVALUES\n('altro_data','dbo','employee','Full','modified_date','employee_id','*',1,NULL),\n('altro_data','dbo','worklog','Full','modified_date','worklog_id','*',1,1440)"
+							"text": "CREATE TABLE [dbo].[watermark_table](\n\t[source_table_id] [int] IDENTITY(1,1) NOT NULL,\n\t[source_SQL_keyvault_connection_string] [varchar](50) NULL,\n\t[source_db_name] [varchar](50) NOT NULL,\n\t[source_schema_name] [varchar](50) NOT NULL,\n\t[source_table_name] [varchar](50) NOT NULL,\n\t[source_load_type] [varchar](50) NOT NULL,\n\t[source_pk_columns] [varchar](50) NULL,\n\t[source_select_columns] [varchar](max) NULL,\n\t[source_watermark_column] [varchar](255) NULL,\n\t[source_load_frequency] [int] NULL,\n\t[source_is_active] [tinyint] NULL,\n\t[destination_partition_by] [varchar](50) NULL,\n\t[destination_zorder_by] [varchar](50) NULL,\n\t[destination_landing_watermark] [varchar](50) NULL,\n\t[destination_bronzing_watermark] [varchar](50) NULL,\n\t[last_etl_timestamp] [datetime] NULL,\n\t[last_pipeline_run_id] [varchar](50) NULL,\n\t[current_pipeline_run_id] [varchar](50) NULL\n CONSTRAINT [UniqueTables] UNIQUE NONCLUSTERED \n(\n\t[source_db_name] ASC,\n\t[source_schema_name] ASC,\n\t[source_table_name] ASC\n)WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]\n) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]\n\n;\nINSERT INTO [dbo].[watermark_table]\n(            [source_db_name]\n      ,[source_schema_name]\n      ,[source_table_name]\n      ,[source_load_type]\n\t  ,[source_watermark_column]\n      ,[source_pk_columns]\n      ,[source_select_columns]\n      ,[source_is_active]\n      ,[source_load_frequency]\n\n\t  )\nVALUES\n('altro_data','dbo','employee','Full','modified_date','employee_id','*',1,NULL),\n('altro_data','dbo','worklog','Full','modified_date','worklog_id','*',1,1440)"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
