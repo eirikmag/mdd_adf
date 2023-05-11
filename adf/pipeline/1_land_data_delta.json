@@ -1,0 +1,182 @@
+{
+	"name": "1_land_data_delta",
+	"properties": {
+		"activities": [
+			{
+				"name": "land_data",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "delete_existing_data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": {
+							"value": "SELECT \n  @{pipeline().parameters.InputSelectColumns}\n  FROM\n   @{concat(\n    pipeline().parameters.InputSourceName,\n    '.',\n    pipeline().parameters.InputSchemaName,\n    '.',\n    pipeline().parameters.InputTableName)\n    }\n   \n   WHERE @{pipeline().parameters.WatermarkColumn} > '@{activity('LookupOldWaterMark').output.firstRow.OldWaterMark}'\n   AND @{pipeline().parameters.WatermarkColumn} <= '@{activity('LookupNewWaterMark').output.firstRow.NewWaterMark}'\n",
+							"type": "Expression"
+						},
+						"queryTimeout": "09:40:00",
+						"partitionOption": "None"
+					},
+					"enableStaging": false
+				}
+			},
+			{
+				"name": "lookup_old_watermark",
+				"description": "To be used to fetch last max(watermark) to use for deltaload.",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 2,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT\n[WaterMark_Bronzing] AS OldWaterMark\nFROM dbo.WatermarkTable\nWHERE SourceDBName = '@{pipeline().parameters.InputSourceName}'\nAND SchemaName = '@{pipeline().parameters.InputSchemaName}'\nAND TableName = '@{pipeline().parameters.InputTableName}'",
+							"type": "Expression"
+						},
+						"queryTimeout": "00:05:00",
+						"partitionOption": "None"
+					}
+				}
+			},
+			{
+				"name": "lookup_new_watermark",
+				"description": "To be used to fetch last max(watermark) to use for deltaload.",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 2,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": {
+							"value": "\nSELECT \n    MAX (@{pipeline().parameters.WatermarkColumn}) AS NewWaterMark\n    FROM \n    @{concat(\n    \t\tpipeline().parameters.InputSourceName,\n    \t\t'.',\n    \t\tpipeline().parameters.InputSchemaName,\n    \t\t'.',\n    \t\tpipeline().parameters.InputTableName\n    \t\t)}\n",
+							"type": "Expression"
+						},
+						"queryTimeout": "00:05:00",
+						"partitionOption": "None"
+					}
+				}
+			},
+			{
+				"name": "update_watermark_table",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "land_data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "\nUPDATE [dbo].[WatermarkTable]\n\nSET [WaterMark_Landing] = '@{activity('LookupNewWaterMark').output.firstRow.NewWaterMark}'\n    ,[Last_PipelineRunID] = '@{pipeline().parameters.PipelineRunID}'\n\n\nWHERE SourceDBName = '@{pipeline().parameters.InputSourceName}'\nAND SchemaName = '@{pipeline().parameters.InputSchemaName}'\nAND TableName = '@{pipeline().parameters.InputTableName}'",
+								"type": "Expression"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "delete_existing_data",
+				"description": "Delete existing data in landing folder. so no fear of duplicate data on bronzing",
+				"type": "Delete",
+				"dependsOn": [
+					{
+						"activity": "lookup_old_watermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "lookup_new_watermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"enableLogging": false,
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					}
+				}
+			}
+		],
+		"parameters": {
+			"InputSourceName": {
+				"type": "string"
+			},
+			"InputSchemaName": {
+				"type": "string"
+			},
+			"InputTableName": {
+				"type": "string"
+			},
+			"WatermarkColumn": {
+				"type": "string"
+			},
+			"InputSelectColumns": {
+				"type": "string"
+			},
+			"PipelineRunID": {
+				"type": "string"
+			},
+			"InputSourceSQLKeyVaultConnectionString": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "1_Landing/10_General_Landing"
+		},
+		"annotations": []
+	}
+}

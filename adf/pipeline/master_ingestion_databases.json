@@ -50,7 +50,7 @@
 					"batchCount": 10,
 					"activities": [
 						{
-							"name": "Landing",
+							"name": "landing",
 							"type": "Switch",
 							"dependsOn": [],
 							"userProperties": [],
@@ -64,38 +64,16 @@
 										"value": "Full",
 										"activities": [
 											{
-												"name": "2_Land_Data_Full",
+												"name": "1_land_data_full",
 												"type": "ExecutePipeline",
 												"dependsOn": [],
 												"userProperties": [],
 												"typeProperties": {
-													"waitOnCompletion": true,
-													"parameters": {
-														"InputSourceName": {
-															"value": "@item().SourceDBName",
-															"type": "Expression"
-														},
-														"InputSchemaName": {
-															"value": "@item().SchemaName",
-															"type": "Expression"
-														},
-														"InputTableName": {
-															"value": "@item().TableName",
-															"type": "Expression"
-														},
-														"InputSelectColumns": {
-															"value": "@item().SelectColumns",
-															"type": "Expression"
-														},
-														"PipelineRunID": {
-															"value": "@pipeline().RunId",
-															"type": "Expression"
-														},
-														"InputSourceSQLKeyVaultConnectionString": {
-															"value": "@item().SourceSQLKeyVaultConnectionString",
-															"type": "Expression"
-														}
-													}
+													"pipeline": {
+														"referenceName": "1_land_data_full",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true
 												}
 											}
 										]
@@ -104,42 +82,12 @@
 										"value": "Delta",
 										"activities": [
 											{
-												"name": "2_Land_Data_Delta",
+												"name": "1_land_data_delta",
 												"type": "ExecutePipeline",
 												"dependsOn": [],
 												"userProperties": [],
 												"typeProperties": {
-													"waitOnCompletion": true,
-													"parameters": {
-														"InputSourceName": {
-															"value": "@item().SourceDBName",
-															"type": "Expression"
-														},
-														"InputSchemaName": {
-															"value": "@item().SchemaName",
-															"type": "Expression"
-														},
-														"InputTableName": {
-															"value": "@item().TableName",
-															"type": "Expression"
-														},
-														"WatermarkColumn": {
-															"value": "@item().WatermarkColumn",
-															"type": "Expression"
-														},
-														"InputSelectColumns": {
-															"value": "@item().SelectColumns",
-															"type": "Expression"
-														},
-														"PipelineRunID": {
-															"value": "@pipeline().RunId",
-															"type": "Expression"
-														},
-														"InputSourceSQLKeyVaultConnectionString": {
-															"value": "@item().SourceSQLKeyVaultConnectionString",
-															"type": "Expression"
-														}
-													}
+													"waitOnCompletion": true
 												}
 											}
 										]
@@ -153,33 +101,7 @@
 												"dependsOn": [],
 												"userProperties": [],
 												"typeProperties": {
-													"waitOnCompletion": true,
-													"parameters": {
-														"InputSourceName": {
-															"value": "@item().SourceDBName",
-															"type": "Expression"
-														},
-														"InputSchemaName": {
-															"value": "@item().SchemaName",
-															"type": "Expression"
-														},
-														"InputTableName": {
-															"value": "@item().TableName",
-															"type": "Expression"
-														},
-														"InputSelectColumns": {
-															"value": "@item().SelectColumns",
-															"type": "Expression"
-														},
-														"PipelineRunID": {
-															"value": "@pipeline().RunId",
-															"type": "Expression"
-														},
-														"InputSourceSQLKeyVaultConnectionString": {
-															"value": "@item().SourceSQLKeyVaultConnectionString",
-															"type": "Expression"
-														}
-													}
+													"waitOnCompletion": true
 												}
 											}
 										]
