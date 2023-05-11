@@ -1,5 +1,5 @@
 {
-	"name": "master_ingestion_databases",
+	"name": "0_master_ingestion_databases",
 	"properties": {
 		"description": "Job that loads metadata on tables from watermark table and lands and bronzes to delta-files",
 		"activities": [
