@@ -87,6 +87,10 @@
 												"dependsOn": [],
 												"userProperties": [],
 												"typeProperties": {
+													"pipeline": {
+														"referenceName": "1_land_data_delta",
+														"type": "PipelineReference"
+													},
 													"waitOnCompletion": true
 												}
 											}
@@ -96,11 +100,16 @@
 										"value": "OneTime",
 										"activities": [
 											{
-												"name": "2_Land_Data_OneTime",
+												"name": "1_land_data_one_time",
+												"description": "if we want to land data just once. never do a full load or a delta load again, we invoke this pipeline.",
 												"type": "ExecutePipeline",
 												"dependsOn": [],
 												"userProperties": [],
 												"typeProperties": {
+													"pipeline": {
+														"referenceName": "1_land_data_delta",
+														"type": "PipelineReference"
+													},
 													"waitOnCompletion": true
 												}
 											}
