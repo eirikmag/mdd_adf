@@ -33,6 +33,7 @@
 			},
 			{
 				"name": "insert_dummy_table_data",
+				"description": "insert examples of metadata into watermark_table",
 				"type": "Script",
 				"dependsOn": [
 					{
