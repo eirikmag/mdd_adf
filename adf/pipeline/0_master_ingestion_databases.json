@@ -149,7 +149,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT [SourceTableId] ,[SourceDBName] ,[SchemaName] ,[TableName] ,[LoadType] ,[WaterMarkColumn] ,[PKColumn] ,[WaterMark_Landing] ,[WaterMark_Bronzing] ,[Is_Active] ,[Last_ETL_Timestamp] ,[SelectColumns] FROM [dbo].[WatermarkTable] \nWHERE [Last_PipelineRunID] = '@{pipeline().RunId}'",
+							"value": "SELECT [source_table_id] ,[source_table_name] ,[source_schema_name] ,[source_table_name] ,[source_load_type] ,[source_watermark_column] ,[source_pk_columns] ,[destination_landing_watermark] ,[destination_bronzing_watermark] ,[source_is_active] ,[last_etl_timestamp] ,[source_select_columns] \n    FROM [dbo].[watermark_table] \nWHERE [last_pipeline_run_id] = '@{pipeline().RunId}'",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
