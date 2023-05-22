@@ -16,10 +16,9 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "AzureDatabricksDeltaLakeSource",
-						"exportSettings": {
-							"type": "AzureDatabricksDeltaLakeExportCommand"
-						}
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"sink": {
 						"type": "AzureDatabricksDeltaLakeSink",
@@ -30,6 +29,12 @@
 					"enableStaging": false
 				},
 				"inputs": [
+					{
+						"referenceName": "test_data",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
 					{
 						"referenceName": "databricks_bronze",
 						"type": "DatasetReference",
@@ -51,12 +56,6 @@
 								"type": "Expression"
 							}
 						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "databricks_bronze",
-						"type": "DatasetReference"
 					}
 				]
 			},
