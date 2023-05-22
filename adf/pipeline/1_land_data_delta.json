@@ -11,12 +11,6 @@
 						"dependencyConditions": [
 							"Succeeded"
 						]
-					},
-					{
-						"activity": "lookup_new_watermark",
-						"dependencyConditions": [
-							"Succeeded"
-						]
 					}
 				],
 				"policy": {
@@ -29,12 +23,12 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "SqlServerSource",
+						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT \n  @{pipeline().parameters.InputSelectColumns}\n  FROM\n   @{concat(\n    pipeline().parameters.InputSourceName,\n    '.',\n    pipeline().parameters.InputSchemaName,\n    '.',\n    pipeline().parameters.InputTableName)\n    }\n   \n   WHERE @{pipeline().parameters.WatermarkColumn} > '@{activity('LookupOldWaterMark').output.firstRow.OldWaterMark}'\n   AND @{pipeline().parameters.WatermarkColumn} <= '@{activity('LookupNewWaterMark').output.firstRow.NewWaterMark}'\n",
+							"value": "SELECT \n  @{pipeline().parameters.wm_select_columns}\n  FROM\n   @{concat(\n    pipeline().parameters.wm_source_name,\n    '.',\n    pipeline().parameters.wm_schema_name,\n    '.',\n    pipeline().parameters.wm_table_name)\n    }\n   \n   WHERE @{pipeline().parameters.watermark_column} > '@{activity('lookup_old_watermark').output.firstRow.old_watermark}'",
 							"type": "Expression"
 						},
-						"queryTimeout": "09:40:00",
+						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"sink": {
@@ -45,6 +39,12 @@
 					},
 					"enableStaging": false
 				},
+				"inputs": [
+					{
+						"referenceName": "test_data",
+						"type": "DatasetReference"
+					}
+				],
 				"outputs": [
 					{
 						"referenceName": "databricks_bronze",
@@ -69,36 +69,15 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT\n[WaterMark_Bronzing] AS OldWaterMark\nFROM dbo.WatermarkTable\nWHERE SourceDBName = '@{pipeline().parameters.InputSourceName}'\nAND SchemaName = '@{pipeline().parameters.InputSchemaName}'\nAND TableName = '@{pipeline().parameters.InputTableName}'",
+							"value": "SELECT\n[destination_bronzing_watermark] AS old_watermark\nFROM dbo.watermark_table\nWHERE source_db_name = '@{pipeline().parameters.wm_source_name}'\nAND source_schema_name = '@{pipeline().parameters.wm_schema_name}'\nAND source_table_name = '@{pipeline().parameters.wm_table_name}'",
 							"type": "Expression"
 						},
 						"queryTimeout": "00:05:00",
 						"partitionOption": "None"
-					}
-				}
-			},
-			{
-				"name": "lookup_new_watermark",
-				"description": "To be used to fetch last max(watermark) to use for deltaload.",
-				"type": "Lookup",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 2,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "SqlServerSource",
-						"sqlReaderQuery": {
-							"value": "\nSELECT \n    MAX (@{pipeline().parameters.WatermarkColumn}) AS NewWaterMark\n    FROM \n    @{concat(\n    \t\tpipeline().parameters.InputSourceName,\n    \t\t'.',\n    \t\tpipeline().parameters.InputSchemaName,\n    \t\t'.',\n    \t\tpipeline().parameters.InputTableName\n    \t\t)}\n",
-							"type": "Expression"
-						},
-						"queryTimeout": "00:05:00",
-						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "watermark_table",
+						"type": "DatasetReference"
 					}
 				}
 			},

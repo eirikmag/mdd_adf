@@ -1,0 +1,12 @@
+{
+	"name": "test_data",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "altro_orchestration",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
