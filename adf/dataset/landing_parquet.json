@@ -12,10 +12,10 @@
 			"source_name": {
 				"type": "string"
 			},
-			"source_schema": {
+			"source_schema_name": {
 				"type": "string"
 			},
-			"source_table": {
+			"source_table_name": {
 				"type": "string"
 			}
 		},
