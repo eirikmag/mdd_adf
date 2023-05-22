@@ -37,7 +37,17 @@
 							"type": "AzureDatabricksDeltaLakeImportCommand"
 						}
 					},
-					"enableStaging": false
+					"enableStaging": true,
+					"stagingSettings": {
+						"linkedServiceName": {
+							"referenceName": "staging_storage",
+							"type": "LinkedServiceReference"
+						},
+						"path": {
+							"value": "@concat(pipeline().parameters.wm_source_type,\n        '/',\n        pipeline().parameters.wm_source_name,\n        '/',\n        pipeline().parameters.wm_schema_name,\n        '/',\n        pipeline().parameters.wm_table_name\n        )",
+							"type": "Expression"
+						}
+					}
 				},
 				"inputs": [
 					{
@@ -139,6 +149,9 @@
 				"type": "string"
 			},
 			"source_sql_keyvault_connection_string": {
+				"type": "string"
+			},
+			"wm_source_type": {
 				"type": "string"
 			}
 		},
