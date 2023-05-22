@@ -5,14 +5,7 @@
 			{
 				"name": "land_data",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "delete_existing_data",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -45,28 +38,6 @@
 						"type": "DatasetReference"
 					}
 				]
-			},
-			{
-				"name": "delete_existing_data",
-				"description": "Delete existing data in landing folder. so no fear of duplicate data on bronzing",
-				"type": "Delete",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"enableLogging": false,
-					"storeSettings": {
-						"type": "AzureBlobFSReadSettings",
-						"recursive": true,
-						"enablePartitionDiscovery": false
-					}
-				}
 			},
 			{
 				"name": "update_watermark_table",
