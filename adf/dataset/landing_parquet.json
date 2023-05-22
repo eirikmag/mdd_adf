@@ -24,6 +24,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@concat( dataset().source_type,\n        '/',\n        dataset().source_name,\n        '/',\n        dataset().source_schema,\n        '/',\n        dataset().source_table\n        )\n        ",
+					"type": "Expression"
+				},
 				"fileSystem": "landing"
 			},
 			"compressionCodec": "snappy"
