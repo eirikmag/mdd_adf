@@ -1,0 +1,29 @@
+{
+	"name": "databricks_bronze",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "databricks_delta_lake",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"table_name": {
+				"type": "string"
+			},
+			"schema_name": {
+				"type": "string"
+			},
+			"source_type": {
+				"type": "string"
+			},
+			"source_name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureDatabricksDeltaLakeDataset",
+		"typeProperties": {
+			"database": "bronze"
+		},
+		"schema": []
+	}
+}
