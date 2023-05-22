@@ -168,10 +168,9 @@
 				"type": "Script",
 				"dependsOn": [
 					{
-						"activity": "bronze_for_each_table",
+						"activity": "get_landed_tables",
 						"dependencyConditions": [
-							"Skipped",
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -198,51 +197,8 @@
 						}
 					]
 				}
-			},
-			{
-				"name": "bronze_for_each_table",
-				"description": "For every n tables, start a spark cluster",
-				"type": "ForEach",
-				"dependsOn": [
-					{
-						"activity": "get_landed_tables",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"items": {
-						"value": "@range(\n    1,\n    div(\n        sub(\n            add(\n                activity('get_landed_tables').output.count\n                ,pipeline().parameters.MaxSequentialTablesToBronze\n            )\n            ,1\n        )\n        ,pipeline().parameters.MaxSequentialTablesToBronze\n    )\n)",
-						"type": "Expression"
-					},
-					"isSequential": false,
-					"batchCount": 6,
-					"activities": [
-						{
-							"name": "bronze_data",
-							"type": "ExecutePipeline",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"pipeline": {
-									"referenceName": "2_bronzing_databricks_notebooks",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true
-							}
-						}
-					]
-				}
 			}
 		],
-		"parameters": {
-			"MaxSequentialTablesToBronze": {
-				"type": "int",
-				"defaultValue": 12
-			}
-		},
 		"folder": {
 			"name": "0_master_pipelines"
 		},
