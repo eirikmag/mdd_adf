@@ -7,7 +7,13 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "delete_existing_data",
+						"activity": "lookup_old_watermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "lookup_new_watermark",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -125,41 +131,6 @@
 							}
 						}
 					]
-				}
-			},
-			{
-				"name": "delete_existing_data",
-				"description": "Delete existing data in landing folder. so no fear of duplicate data on bronzing",
-				"type": "Delete",
-				"dependsOn": [
-					{
-						"activity": "lookup_old_watermark",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "lookup_new_watermark",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"enableLogging": false,
-					"storeSettings": {
-						"type": "AzureBlobFSReadSettings",
-						"recursive": true,
-						"enablePartitionDiscovery": false
-					}
 				}
 			}
 		],
