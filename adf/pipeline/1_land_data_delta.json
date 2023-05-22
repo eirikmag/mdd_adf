@@ -160,7 +160,7 @@
 			}
 		},
 		"folder": {
-			"name": "1_landing"
+			"name": "1_landing/1_azure_databricks_delta_lake"
 		},
 		"annotations": []
 	}

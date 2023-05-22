@@ -1,5 +1,5 @@
 {
-	"name": "1_land_data_full",
+	"name": "1_land_data_full_autoloader",
 	"properties": {
 		"activities": [
 			{
@@ -135,7 +135,7 @@
 			}
 		},
 		"folder": {
-			"name": "1_landing/1_azure_databricks_delta_lake"
+			"name": "1_landing/2_azure_databricks_auto_loader"
 		},
 		"annotations": []
 	}
