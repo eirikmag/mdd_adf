@@ -116,12 +116,16 @@
 					"secureInput": false
 				},
 				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "altro_orchestration",
+					"type": "LinkedServiceReference"
+				},
 				"typeProperties": {
 					"scripts": [
 						{
 							"type": "Query",
 							"text": {
-								"value": "\nUPDATE [dbo].[WatermarkTable]\n\nSET [WaterMark_Landing] = '@{activity('LookupNewWaterMark').output.firstRow.NewWaterMark}'\n    ,[Last_PipelineRunID] = '@{pipeline().parameters.PipelineRunID}'\n\n\nWHERE SourceDBName = '@{pipeline().parameters.InputSourceName}'\nAND SchemaName = '@{pipeline().parameters.InputSchemaName}'\nAND TableName = '@{pipeline().parameters.InputTableName}'",
+								"value": "\nUPDATE [dbo].[WatermarkTable]\n\nSET [WaterMark_Landing] = '@{activity('lookup_old_watermark').output.firstRow.NewWaterMark}'\n    ,[last_pipeline_run_id] = '@{pipeline().parameters.pipeline_run_id}'\n\n\nWHERE SourceDBName = '@{pipeline().parameters.wm_source_name}'\nAND SchemaName = '@{pipeline().parameters.wm_schema_name}'\nAND TableName = '@{pipeline().parameters.wm_table_name}'",
 								"type": "Expression"
 							}
 						}

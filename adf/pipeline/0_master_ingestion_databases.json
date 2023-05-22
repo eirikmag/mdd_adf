@@ -183,12 +183,16 @@
 					"secureInput": false
 				},
 				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "altro_orchestration",
+					"type": "LinkedServiceReference"
+				},
 				"typeProperties": {
 					"scripts": [
 						{
 							"type": "NonQuery",
 							"text": {
-								"value": "UPDATE [dbo].[WatermarkTable]\nSET Current_PipelineRunID = NULL\nWHERE Current_PipelineRunID = '@{pipeline().RunId}'",
+								"value": "UPDATE [dbo].[watermark_table]\nSET current_pipeline_run_id = NULL\nWHERE current_pipeline_run_id = '@{pipeline().RunId}'",
 								"type": "Expression"
 							}
 						}
