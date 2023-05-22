@@ -17,6 +17,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT \n  @{pipeline().parameters.wm_select_columns}\n  FROM\n   @{concat(\n    pipeline().parameters.wm_source_name,\n    '.',\n    pipeline().parameters.wm_schema_name,\n    '.',\n    pipeline().parameters.wm_table_name\n    )\n    }\n   \n",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -105,7 +109,7 @@
 		"parameters": {
 			"wm_source_name": {
 				"type": "string",
-				"defaultValue": "altro_data"
+				"defaultValue": "altro_data_example"
 			},
 			"wm_schema_name": {
 				"type": "string",
@@ -113,7 +117,7 @@
 			},
 			"wm_table_name": {
 				"type": "string",
-				"defaultValue": "employee"
+				"defaultValue": "person"
 			},
 			"wm_select_columns": {
 				"type": "string",
