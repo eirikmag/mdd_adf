@@ -58,7 +58,25 @@
 				"outputs": [
 					{
 						"referenceName": "landing_parquet",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"source_type": {
+								"value": "@pipeline().parameters.wm_source_type",
+								"type": "Expression"
+							},
+							"source_name": {
+								"value": "@pipeline().parameters.wm_source_name",
+								"type": "Expression"
+							},
+							"source_schema_name": {
+								"value": "@pipeline().parameters.wm_schema_name",
+								"type": "Expression"
+							},
+							"source_table_name": {
+								"value": "@pipeline().parameters.wm_table_name",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			},
