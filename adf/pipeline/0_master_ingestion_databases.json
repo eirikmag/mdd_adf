@@ -60,7 +60,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"on": {
-									"value": "@item().LoadType",
+									"value": "@item().source_load_type",
 									"type": "Expression"
 								},
 								"cases": [
