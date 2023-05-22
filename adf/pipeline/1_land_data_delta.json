@@ -48,7 +48,13 @@
 				"outputs": [
 					{
 						"referenceName": "databricks_bronze",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"source_table_name": "@tolower(pipeline().parameters.wm_table_name)",
+							"source_schema_name": "@tolower(pipeline().parameters.wm_schema_name)",
+							"source_type": "@tolower(pipeline().parameters.wm_source_type)",
+							"source_name": "@tolower(pipeline().parameters.wm_source_name)"
+						}
 					}
 				]
 			},
