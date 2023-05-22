@@ -7,10 +7,6 @@
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
-		"schema": [],
-		"typeProperties": {
-			"schema": "altro_data_example",
-			"table": "person"
-		}
+		"schema": []
 	}
 }
