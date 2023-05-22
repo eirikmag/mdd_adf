@@ -24,7 +24,7 @@
 		"typeProperties": {
 			"database": "bronze",
 			"table": {
-				"value": "@concat( dataset().source_type,\r\n        '-',\r\n        dataset().source_name,\r\n        '_',\r\n        dataset().source_schema_name,\r\n        '_',\r\n        dataset().source_table_name)\r\n        ",
+				"value": "@concat( dataset().source_type,\n        '-',\n        dataset().source_name,\n        '_',\n        dataset().source_schema_name,\n        '_',\n        dataset().source_table_name)\n        ",
 				"type": "Expression"
 			}
 		},
