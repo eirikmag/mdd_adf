@@ -104,16 +104,20 @@
 		],
 		"parameters": {
 			"wm_source_name": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "altro_data"
 			},
 			"wm_schema_name": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "dbo"
 			},
 			"wm_table_name": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "employee"
 			},
 			"wm_select_columns": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "*"
 			},
 			"pipeline_run_id": {
 				"type": "string"
@@ -122,7 +126,8 @@
 				"type": "string"
 			},
 			"wm_source_type": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "database"
 			}
 		},
 		"folder": {
