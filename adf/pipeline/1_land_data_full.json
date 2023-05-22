@@ -31,8 +31,20 @@
 						"queryTimeout": "00:05:00",
 						"partitionOption": "None"
 					},
+					"sink": {
+						"type": "AzureDatabricksDeltaLakeSink",
+						"importSettings": {
+							"type": "AzureDatabricksDeltaLakeImportCommand"
+						}
+					},
 					"enableStaging": false
-				}
+				},
+				"outputs": [
+					{
+						"referenceName": "databricks_bronze",
+						"type": "DatasetReference"
+					}
+				]
 			},
 			{
 				"name": "delete_existing_data",
@@ -57,7 +69,7 @@
 				}
 			},
 			{
-				"name": "update_wm_table",
+				"name": "update_watermark_table",
 				"description": "update watermark table with successfully landed table.",
 				"type": "Script",
 				"dependsOn": [
@@ -90,22 +102,22 @@
 			}
 		],
 		"parameters": {
-			"InputSourceName": {
+			"wm_source_name": {
 				"type": "string"
 			},
-			"InputSchemaName": {
+			"wm_schema_name": {
 				"type": "string"
 			},
-			"InputTableName": {
+			"wm_table_name": {
 				"type": "string"
 			},
-			"InputSelectColumns": {
+			"wm_select_columns": {
 				"type": "string"
 			},
-			"PipelineRunID": {
+			"pipeline_run_id": {
 				"type": "string"
 			},
-			"InputSourceSQLKeyVaultConnectionString": {
+			"source_sql_keyvault_connection_string": {
 				"type": "string"
 			}
 		},
