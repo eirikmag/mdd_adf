@@ -19,7 +19,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT [SourceTableId] ,[SourceSQLKeyVaultConnectionString],[SourceDBName] ,[SchemaName] ,[TableName] ,[LoadType] ,[WaterMarkColumn] ,[PKColumn] ,[WaterMark_Landing] ,[WaterMark_Bronzing] ,[Is_Active] ,[Last_ETL_Timestamp] ,[SelectColumns] FROM [dbo].[WatermarkTable] \nWHERE Is_Active = 1\nAND Current_PipelineRunID is null\nAND (DATEDIFF(MINUTE, Last_ETL_Timestamp, getdate()) > ([LoadFrequency] * 0.95)\nOR Last_ETL_Timestamp IS NULL)\n\n;\nUPDATE [dbo].[WatermarkTable]\nSET Current_PipelineRunID = '@{pipeline().RunId}'\nWHERE Is_Active = 1\nAND Current_PipelineRunID is null\nAND (DATEDIFF(MINUTE, Last_ETL_Timestamp, getdate()) > ([LoadFrequency] * 0.95)\nOR Last_ETL_Timestamp IS NULL)\n",
+							"value": "SELECT [source_table_id]\n      ,[source_SQL_keyvault_connection_string]\n      ,[source_db_name]\n      ,[source_schema_name]\n      ,[source_table_name]\n      ,[source_load_type]\n      ,[source_pk_columns]\n      ,[source_select_columns]\n      ,[source_watermark_column]\n      ,[source_load_frequency]\n      ,[source_is_active]\n      ,[destination_landing_watermark]\n      ,[destination_bronzing_watermark]\n      ,[last_etl_timestamp]\n      ,[last_pipeline_run_id]\n      ,[current_pipeline_run_id]\n  FROM [dbo].[watermark_table]\nWHERE source_is_active = 1\nAND current_pipeline_run_id is null\n;\nUPDATE [dbo].[watermark_table]\nSET current_pipeline_run_id = '@{pipeline().RunId}'\nWHERE source_is_active = 1\nAND current_pipeline_run_id is null",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
