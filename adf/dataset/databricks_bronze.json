@@ -6,10 +6,10 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"table_name": {
+			"source_table_name": {
 				"type": "string"
 			},
-			"schema_name": {
+			"source_schema_name": {
 				"type": "string"
 			},
 			"source_type": {
@@ -22,7 +22,11 @@
 		"annotations": [],
 		"type": "AzureDatabricksDeltaLakeDataset",
 		"typeProperties": {
-			"database": "bronze"
+			"database": "bronze",
+			"table": {
+				"value": "@concat( dataset().source_type,\r\n        '-',\r\n        dataset().source_name,\r\n        '_',\r\n        dataset().source_schema_name,\r\n        '_',\r\n        dataset().source_table_name)\r\n        ",
+				"type": "Expression"
+			}
 		},
 		"schema": []
 	}
