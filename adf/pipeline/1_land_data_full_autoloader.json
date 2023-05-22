@@ -25,9 +25,12 @@
 						"partitionOption": "None"
 					},
 					"sink": {
-						"type": "AzureDatabricksDeltaLakeSink",
-						"importSettings": {
-							"type": "AzureDatabricksDeltaLakeImportCommand"
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
 						}
 					},
 					"enableStaging": true,
@@ -35,6 +38,14 @@
 						"linkedServiceName": {
 							"referenceName": "staging_storage",
 							"type": "LinkedServiceReference"
+						}
+					},
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
 						}
 					}
 				},
@@ -46,26 +57,8 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "databricks_bronze",
-						"type": "DatasetReference",
-						"parameters": {
-							"source_table_name": {
-								"value": "@pipeline().parameters.wm_table_name",
-								"type": "Expression"
-							},
-							"source_schema_name": {
-								"value": "@pipeline().parameters.wm_schema_name",
-								"type": "Expression"
-							},
-							"source_type": {
-								"value": "@pipeline().parameters.wm_source_type",
-								"type": "Expression"
-							},
-							"source_name": {
-								"value": "@pipeline().parameters.wm_source_name",
-								"type": "Expression"
-							}
-						}
+						"referenceName": "landing_parquet",
+						"type": "DatasetReference"
 					}
 				]
 			},
