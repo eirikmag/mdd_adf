@@ -1,0 +1,167 @@
+{
+	"name": "1_land_data_delta_autoloader",
+	"properties": {
+		"activities": [
+			{
+				"name": "land_data",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "lookup_old_watermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT \n  @{pipeline().parameters.wm_select_columns}\n  FROM\n   @{concat(\n    pipeline().parameters.wm_source_name,\n    '.',\n    pipeline().parameters.wm_schema_name,\n    '.',\n    pipeline().parameters.wm_table_name)\n    }\n   \n   WHERE @{pipeline().parameters.watermark_column} > '@{activity('lookup_old_watermark').output.firstRow.old_watermark}'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureDatabricksDeltaLakeSink",
+						"importSettings": {
+							"type": "AzureDatabricksDeltaLakeImportCommand"
+						}
+					},
+					"enableStaging": true,
+					"stagingSettings": {
+						"linkedServiceName": {
+							"referenceName": "staging_storage",
+							"type": "LinkedServiceReference"
+						},
+						"path": {
+							"value": "@concat(pipeline().parameters.wm_source_type,\n        '/',\n        pipeline().parameters.wm_source_name,\n        '/',\n        pipeline().parameters.wm_schema_name,\n        '/',\n        pipeline().parameters.wm_table_name\n        )",
+							"type": "Expression"
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "test_data",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "databricks_bronze",
+						"type": "DatasetReference",
+						"parameters": {
+							"source_table_name": "@tolower(pipeline().parameters.wm_table_name)",
+							"source_schema_name": "@tolower(pipeline().parameters.wm_schema_name)",
+							"source_type": "@tolower(pipeline().parameters.wm_source_type)",
+							"source_name": "@tolower(pipeline().parameters.wm_source_name)"
+						}
+					}
+				]
+			},
+			{
+				"name": "lookup_old_watermark",
+				"description": "To be used to fetch last max(watermark) to use for deltaload.",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 2,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT\n[destination_bronzing_watermark] AS old_watermark\nFROM dbo.watermark_table\nWHERE source_db_name = '@{pipeline().parameters.wm_source_name}'\nAND source_schema_name = '@{pipeline().parameters.wm_schema_name}'\nAND source_table_name = '@{pipeline().parameters.wm_table_name}'",
+							"type": "Expression"
+						},
+						"queryTimeout": "00:05:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "watermark_table",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "update_watermark_table",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "land_data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "altro_orchestration",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "\nUPDATE [dbo].[WatermarkTable]\n\nSET [WaterMark_Landing] = '@{activity('lookup_old_watermark').output.firstRow.NewWaterMark}'\n    ,[last_pipeline_run_id] = '@{pipeline().parameters.pipeline_run_id}'\n\n\nWHERE SourceDBName = '@{pipeline().parameters.wm_source_name}'\nAND SchemaName = '@{pipeline().parameters.wm_schema_name}'\nAND TableName = '@{pipeline().parameters.wm_table_name}'",
+								"type": "Expression"
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"wm_source_name": {
+				"type": "string"
+			},
+			"wm_schema_name": {
+				"type": "string"
+			},
+			"wm_table_name": {
+				"type": "string"
+			},
+			"watermark_column": {
+				"type": "string"
+			},
+			"wm_select_columns": {
+				"type": "string"
+			},
+			"pipeline_run_id": {
+				"type": "string"
+			},
+			"source_sql_keyvault_connection_string": {
+				"type": "string"
+			},
+			"wm_source_type": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "1_landing/2_azure_databricks_auto_loader"
+		},
+		"annotations": []
+	}
+}
