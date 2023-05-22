@@ -20,14 +20,8 @@
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
-			"schema": {
-				"value": "@dataset().schema",
-				"type": "Expression"
-			},
-			"table": {
-				"value": "@dataset().table",
-				"type": "Expression"
-			}
+			"schema": "dbo",
+			"table": "watermark_table"
 		}
 	}
 }
