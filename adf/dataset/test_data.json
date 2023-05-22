@@ -3,7 +3,10 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "altro_orchestration",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"database": "orchestration_db"
+			}
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
