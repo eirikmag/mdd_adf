@@ -16,13 +16,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "SqlServerSource",
-						"sqlReaderQuery": {
-							"value": "SELECT \n  @{pipeline().parameters.InputSelectColumns}\n  FROM\n   @{concat(\n    pipeline().parameters.InputSourceName,\n    '.',\n    pipeline().parameters.InputSchemaName,\n    '.',\n    pipeline().parameters.InputTableName)\n    }\n   \n",
-							"type": "Expression"
-						},
-						"queryTimeout": "00:05:00",
-						"partitionOption": "None"
+						"type": "AzureDatabricksDeltaLakeSource",
+						"exportSettings": {
+							"type": "AzureDatabricksDeltaLakeExportCommand"
+						}
 					},
 					"sink": {
 						"type": "AzureDatabricksDeltaLakeSink",
@@ -32,6 +29,30 @@
 					},
 					"enableStaging": false
 				},
+				"inputs": [
+					{
+						"referenceName": "databricks_bronze",
+						"type": "DatasetReference",
+						"parameters": {
+							"source_table_name": {
+								"value": "@pipeline().parameters.wm_table_name",
+								"type": "Expression"
+							},
+							"source_schema_name": {
+								"value": "@pipeline().parameters.wm_schema_name",
+								"type": "Expression"
+							},
+							"source_type": {
+								"value": "@pipeline().parameters.wm_source_type",
+								"type": "Expression"
+							},
+							"source_name": {
+								"value": "@pipeline().parameters.wm_source_name",
+								"type": "Expression"
+							}
+						}
+					}
+				],
 				"outputs": [
 					{
 						"referenceName": "databricks_bronze",
@@ -93,6 +114,9 @@
 				"type": "string"
 			},
 			"source_sql_keyvault_connection_string": {
+				"type": "string"
+			},
+			"wm_source_type": {
 				"type": "string"
 			}
 		},
