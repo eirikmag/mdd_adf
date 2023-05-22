@@ -31,8 +31,20 @@
 						"queryTimeout": "09:40:00",
 						"partitionOption": "None"
 					},
+					"sink": {
+						"type": "AzureDatabricksDeltaLakeSink",
+						"importSettings": {
+							"type": "AzureDatabricksDeltaLakeImportCommand"
+						}
+					},
 					"enableStaging": false
-				}
+				},
+				"outputs": [
+					{
+						"referenceName": "databricks_bronze",
+						"type": "DatasetReference"
+					}
+				]
 			},
 			{
 				"name": "lookup_old_watermark",
@@ -152,25 +164,25 @@
 			}
 		],
 		"parameters": {
-			"InputSourceName": {
+			"wm_source_name": {
 				"type": "string"
 			},
-			"InputSchemaName": {
+			"wm_schema_name": {
 				"type": "string"
 			},
-			"InputTableName": {
+			"wm_table_name": {
 				"type": "string"
 			},
-			"WatermarkColumn": {
+			"watermark_column": {
 				"type": "string"
 			},
-			"InputSelectColumns": {
+			"wm_select_columns": {
 				"type": "string"
 			},
-			"PipelineRunID": {
+			"pipeline_run_id": {
 				"type": "string"
 			},
-			"InputSourceSQLKeyVaultConnectionString": {
+			"source_sql_keyvault_connection_string": {
 				"type": "string"
 			}
 		},
