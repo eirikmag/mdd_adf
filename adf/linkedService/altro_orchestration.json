@@ -1,11 +1,6 @@
 {
 	"name": "altro_orchestration",
 	"properties": {
-		"parameters": {
-			"database": {
-				"type": "string"
-			}
-		},
 		"annotations": [],
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
