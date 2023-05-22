@@ -109,11 +109,11 @@
 		"parameters": {
 			"wm_source_name": {
 				"type": "string",
-				"defaultValue": "altro_data_example"
+				"defaultValue": "orchestration_db"
 			},
 			"wm_schema_name": {
 				"type": "string",
-				"defaultValue": "dbo"
+				"defaultValue": "altro_data_example"
 			},
 			"wm_table_name": {
 				"type": "string",
